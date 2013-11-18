@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="eo_redirect.exception_listener.class">Eo\RedirectBundle\EventListener\ExceptionListener</parameter>
+    </parameters>
+
+    <services>
+        <!-- Exception listener -->
+        <service id="eo_redirect.exception_listener" class="%eo_redirect.exception_listener.class%">
+            <call method="setContainer">
+                 <argument type="service" id="service_container"/>
+            </call>
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+    </services>
+</container>
