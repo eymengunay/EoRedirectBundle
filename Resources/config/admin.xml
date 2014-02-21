@@ -12,7 +12,7 @@
         <service id="eo_redirect.admin" class="%eo_redirect.redirect_admin.class%">
             <tag name="sonata.admin" manager_type="doctrine_mongodb" group="redirect" label="redirect"/>
             <argument />
-            <argument>%eo_redirect.redirect.class%</argument>
+            <argument>Eo\RedirectBundle\Document\Redirect</argument>
             <argument>SonataAdminBundle:CRUD</argument>
             <call method="setTranslationDomain">
                 <argument>SonataAdminBundle</argument>
