@@ -1,13 +1,13 @@
 <?php
 
 /*
- * This file is part of the JuliusContentBundle package.
+ * This file is part of the EoRedirectBundle package.
  *
- * (c) 2013 Jiabin <hello@jiab.in>
+ * (c) 2014 Eymen Gunay <eymen@egunay.com>
  */
-
 namespace Eo\RedirectBundle\Document;
 
+use Eo\RedirectBundle\Util\RegexUtil;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -17,15 +17,28 @@ use Symfony\Component\HttpFoundation\Request;
 class RedirectRepository extends DocumentRepository
 {
     /**
-     * Get content from request
+     * Get redirect from url
      *
-     * @param  Request          $request
-     * @return ContentInterface
+     * @param  string $url
+     * @return RedirectInterface
      */
-    public function findRequest(Request $request)
+    public function findUrl($url)
     {
-        $url = $request->getPathInfo();
+        $redirects = $this->createQueryBuilder()
+            ->field('pattern')->exists(true)
+            ->field('replacement')->exists(true)
+            ->getQuery()
+            ->execute()
+        ;
 
-        return $this->findOneBy(array('redirectFrom' => $url));
+        foreach ($redirects as $redirect) {
+            if (!preg_match(RegexUtil::regexify($redirect->getPattern()), $url)) {
+                continue;
+            }
+
+            return $redirect;
+        }
+
+        return null;
     }
 }

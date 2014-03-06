@@ -1,20 +1,20 @@
 <?php
 
 /*
- * This file is part of the JuliusLoyaltyBundle package.
+ * This file is part of the EoRedirectBundle package.
  *
- * (c) 2013 Jiabin <hello@jiab.in>
+ * (c) 2014 Eymen Gunay <eymen@egunay.com>
  */
-
 namespace Eo\RedirectBundle\Document;
 
+use Eo\RedirectBundle\Model\RedirectInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document(repositoryClass="Eo\RedirectBundle\Document\RedirectRepository")
  * @ODM\ChangeTrackingPolicy("DEFERRED_IMPLICIT")
  */
-class Redirect
+class Redirect implements RedirectInterface
 {
     /**
      * @ODM\Id(strategy="AUTO")
@@ -24,12 +24,17 @@ class Redirect
     /**
      * @ODM\String
      */
-    protected $redirectFrom;
+    protected $pattern;
 
     /**
      * @ODM\String
      */
-    protected $redirectTo;
+    protected $replacement;
+
+    /**
+     * @ODM\Int
+     */
+    protected $statusCode = 302;
 
     /**
      * @ODM\Date
@@ -40,6 +45,11 @@ class Redirect
      * @ODM\Date
      */
     protected $updatedAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     /**
      * Get id
@@ -52,49 +62,61 @@ class Redirect
     }
 
     /**
-     * Set redirectFrom
-     *
-     * @param string $redirectFrom
-     * @return self
+     * {@inheritdoc}
      */
-    public function setRedirectFrom($redirectFrom)
+    public function setPattern($pattern)
     {
-        $this->redirectFrom = $redirectFrom;
+        $this->pattern = $pattern;
 
         return $this;
     }
 
     /**
-     * Get redirectFrom
-     *
-     * @return string $redirectFrom
+     * {@inheritdoc}
      */
-    public function getRedirectFrom()
+    public function getPattern()
     {
-        return $this->redirectFrom;
+        return $this->pattern;
     }
 
     /**
-     * Set redirectTo
-     *
-     * @param string $redirectTo
-     * @return self
+     * {@inheritdoc}
      */
-    public function setRedirectTo($redirectTo)
+    public function setReplacement($replacement)
     {
-        $this->redirectTo = $redirectTo;
+        $this->replacement = $replacement;
 
         return $this;
     }
 
     /**
-     * Get redirectTo
-     *
-     * @return string $redirectTo
+     * {@inheritdoc}
      */
-    public function getRedirectTo()
+    public function getReplacement()
     {
-        return $this->redirectTo;
+        return $this->replacement;
+    }
+
+    /**
+     * Sets the response status code.
+     *
+     * @param integer $code HTTP status code
+     */
+    public function setStatusCode($code)
+    {
+        $this->statusCode = $code = (int) $code;
+
+        return $this;
+    }
+
+    /**
+     * Retrieves the status code for the current redirect.
+     *
+     * @return integer Status code
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 
     /**

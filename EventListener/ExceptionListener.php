@@ -1,13 +1,13 @@
 <?php
 
 /*
- * This file is part of the JuliusEventBundle package.
+ * This file is part of the EoRedirectBundle package.
  *
- * (c) 2013 Jiabin <hello@jiab.in>
+ * (c) 2014 Eymen Gunay <eymen@egunay.com>
  */
-
 namespace Eo\RedirectBundle\EventListener;
 
+use Eo\RedirectBundle\Util\RegexUtil;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,17 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 class ExceptionListener extends ContainerAware
 {
     /**
-     * Resolving prices and promotions can be a 
-     * high resource consuming operation as it needs to 
-     * iterate over all sectors, seances and events.
-     *
-     * To levarage the load it loads all found seances
-     * into memory with a single query, checks for any 
-     * attached promotions and resolves the default price
-     * for those seances that don't belong to any promotion.
-     * Once all available seance prices are resolved, it 
-     * starts to associate seances to their events to calculate
-     * remaining fields.
+     * Kernel exception
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
@@ -42,9 +32,12 @@ class ExceptionListener extends ContainerAware
 
         $dm = $this->container->get('doctrine.odm.mongodb.document_manager');
         $repository = $dm->getRepository('EoRedirectBundle:Redirect');
+        $url = $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath() . $request->getRequestUri();
         // Set redirect response
-        if ($redirectTo = $repository->findRequest($request)) {
-            $response = new RedirectResponse($redirectTo->getRedirectTo());
+        if ($redirect = $repository->findUrl($url)) {
+            $newUrl = preg_replace(RegexUtil::regexify($redirect->getPattern()), $redirect->getReplacement(), $url);
+            
+            $response = new RedirectResponse($newUrl, $redirect->getStatusCode());
             $event->setResponse($response);
         }
     }

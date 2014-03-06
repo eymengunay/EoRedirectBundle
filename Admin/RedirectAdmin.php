@@ -16,8 +16,8 @@ class RedirectAdmin extends Admin
     protected function configureFormFields(FormMapper $formMapper)
     {
         $formMapper
-            ->add('redirectFrom', null, array('required' => true))
-            ->add('redirectTo', null, array('required' => true))
+            ->add('pattern', null, array('required' => true))
+            ->add('replacement', null, array('required' => true))
         ;
     }
 
@@ -28,10 +28,18 @@ class RedirectAdmin extends Admin
     {
         $listMapper
             ->addIdentifier('id')
-            ->add('redirectFrom', null, array('editable' => true))
-            ->add('redirectTo', null, array('editable' => true))
+            ->add('pattern', null, array('editable' => true))
+            ->add('replacement', null, array('editable' => true))
             ->add('createdAt')
             ->add('updatedAt')
         ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preUpdate($redirect)
+    {
+        $redirect->setUpdatedAt(new \DateTime());
     }
 }
